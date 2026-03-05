@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>D&D Initiative Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Initiative Tracker</h1>
+
+    <div class="input-section">
+        <input type="text" id="nameInput" placeholder="Name">
+        <input type="number" id="initiativeInput" placeholder="Initiative">
+        <button onclick="addCharacter()">Add</button>
+    </div>
+
+    <h2>Player Characters</h2>
+
+<input type="text" id="permanentNameInput" placeholder="Player Name">
+<button onclick="addPermanentCharacter()">Add Permanent</button>
+<button onclick="clearPermanentCharacters()">Clear All</button>
+
+<ul id="permanentList"></ul>
+
+    <h2 id="roundDisplay">Round: 1</h2>
+<button onclick="nextTurn()">Next</button>
+
+    <ul id="initiativeList"></ul>
+
+    <script src="script.js"></script>
+</body>
+</html>
