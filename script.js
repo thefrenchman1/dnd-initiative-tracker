@@ -215,3 +215,11 @@ function removeCondition(charIndex, condIndex) {
     conditionsMap[charIndex].splice(condIndex, 1);
     renderList();
 }
+
+// Keyboard Shortcut for Next Turn
+document.addEventListener("keydown", function(event) {
+    if (event.key === "ArrowRight") {
+        event.preventDefault();
+        nextTurn();
+    }
+});
