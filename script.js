@@ -1,8 +1,11 @@
+// ==================
+// VARIABLES
+// ==================
 let characters = [];
 let permanentCharacters = [];
 let currentTurnIndex = 0;
 let round = 1;
-let conditionsMap = {}; // key = index of character in combat
+let conditionsMap = {}; // key = character name
 
 // Load permanent characters from browser storage
 window.onload = function () {
@@ -13,10 +16,9 @@ window.onload = function () {
     }
 };
 
-// --------------------
-// Combat Characters
-// --------------------
-
+// ==================
+// COMBAT CHARACTERS
+// ==================
 function addCharacter() {
     const name = document.getElementById("nameInput").value;
     const initiative = parseInt(document.getElementById("initiativeInput").value);
@@ -62,6 +64,9 @@ function nextTurn() {
     renderList();
 }
 
+// ==================
+// RENDER LIST & CONDITIONS
+// ==================
 function renderList() {
     const list = document.getElementById("initiativeList");
     list.innerHTML = "";
@@ -78,9 +83,9 @@ function renderList() {
         const conditionsSpan = document.createElement("span");
         conditionsSpan.style.marginLeft = "10px";
 
-        const conds = conditionsMap[index] || [];
+        const charName = character.name;
+        const conds = conditionsMap[charName] || [];
 
-        // Display each condition
         conds.forEach((cond, condIndex) => {
             const condTag = document.createElement("span");
             condTag.textContent = cond;
@@ -92,7 +97,7 @@ function renderList() {
             condTag.style.fontSize = "0.8em";
             condTag.style.cursor = "pointer";
             condTag.title = "Click to remove condition";
-            condTag.onclick = () => removeCondition(index, condIndex);
+            condTag.onclick = () => removeCondition(charName, condIndex);
             conditionsSpan.appendChild(condTag);
         });
 
@@ -100,12 +105,12 @@ function renderList() {
         const addCondButton = document.createElement("button");
         addCondButton.textContent = "+Condition";
         addCondButton.style.marginLeft = "5px";
-        addCondButton.onclick = () => addCondition(index);
+        addCondButton.onclick = () => addCondition(charName);
 
         li.appendChild(conditionsSpan);
         li.appendChild(addCondButton);
 
-        // ===== Death button at the very end =====
+        // ===== Death button =====
         const removeButton = document.createElement("button");
         removeButton.textContent = "💀 Ded";
         removeButton.classList.add("remove-btn");
@@ -126,20 +131,34 @@ function renderList() {
     document.getElementById("roundDisplay").textContent = `Round: ${round}`;
 }
 
-// --------------------
-// Permanent Characters
-// --------------------
+function addCondition(charName) {
+    const condition = prompt(`Enter condition for ${charName} (e.g., Poisoned, Paralyzed):`);
+    if (!condition) return;
 
+    if (!conditionsMap[charName]) conditionsMap[charName] = [];
+    conditionsMap[charName].push(condition);
+
+    renderList();
+}
+
+function removeCondition(charName, condIndex) {
+    if (!conditionsMap[charName]) return;
+
+    conditionsMap[charName].splice(condIndex, 1);
+    renderList();
+}
+
+// ==================
+// PERMANENT CHARACTERS
+// ==================
 function addPermanentCharacter() {
     const name = document.getElementById("permanentNameInput").value;
-
     if (!name) return;
 
     permanentCharacters.push(name);
     localStorage.setItem("permanentCharacters", JSON.stringify(permanentCharacters));
 
     renderPermanentList();
-
     document.getElementById("permanentNameInput").value = "";
 }
 
@@ -185,8 +204,14 @@ function clearPermanentCharacters() {
     renderPermanentList();
 }
 
+// ==================
+// REMOVE COMBAT CHARACTER
+// ==================
 function removeCharacter(index) {
-    characters.splice(index, 1);
+    const removed = characters.splice(index, 1)[0];
+
+    // Remove their conditions when they die
+    if (conditionsMap[removed.name]) delete conditionsMap[removed.name];
 
     if (index < currentTurnIndex) {
         currentTurnIndex--;
@@ -199,24 +224,9 @@ function removeCharacter(index) {
     renderList();
 }
 
-function addCondition(charIndex) {
-    const condition = prompt("Enter condition (e.g., Poisoned, Paralyzed):");
-    if (!condition) return;
-
-    if (!conditionsMap[charIndex]) conditionsMap[charIndex] = [];
-    conditionsMap[charIndex].push(condition);
-
-    renderList();
-}
-
-function removeCondition(charIndex, condIndex) {
-    if (!conditionsMap[charIndex]) return;
-
-    conditionsMap[charIndex].splice(condIndex, 1);
-    renderList();
-}
-
-// Keyboard Shortcut for Next Turn
+// ==================
+// KEYBOARD SHORTCUTS
+// ==================
 document.addEventListener("keydown", function(event) {
     if (event.key === "ArrowRight") {
         event.preventDefault();
